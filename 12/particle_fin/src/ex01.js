@@ -46,7 +46,7 @@ export default function example() {
   const material = new THREE.PointsMaterial({
     size: 0.02,
     // size: 1,
-    // sizeAttenuation: false
+    sizeAttenuation: false,
   });
   // material.size = 0.02;
   // material.sizeAttenuation = false;

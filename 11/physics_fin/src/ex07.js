@@ -94,6 +94,11 @@ export default function example() {
   floorMesh.receiveShadow = true;
   scene.add(floorMesh);
 
+  const cube = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3());
+  cube.intersectsBox;
+  cube
+    .setFromObject //mesh
+    ();
   // 도미노 생성
   const dominos = [];
   let domino;

@@ -6,162 +6,153 @@ import gsap from 'gsap';
 // ----- 주제: 형태가 바뀌는 이미지 패널
 
 export default function example() {
-	// Renderer
-	const canvas = document.querySelector('#three-canvas');
-	const renderer = new THREE.WebGLRenderer({
-		canvas,
-		antialias: true
-	});
-	renderer.setSize(window.innerWidth, window.innerHeight);
-	renderer.setPixelRatio(window.devicePixelRatio > 1 ? 2 : 1);
+  // Renderer
+  const canvas = document.querySelector('#three-canvas');
+  const renderer = new THREE.WebGLRenderer({
+    canvas,
+    antialias: true,
+  });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(window.devicePixelRatio > 1 ? 2 : 1);
 
-	// Scene
-	const scene = new THREE.Scene();
+  // Scene
+  const scene = new THREE.Scene();
 
-	// Camera
-	const camera = new THREE.PerspectiveCamera(
-		75,
-		window.innerWidth / window.innerHeight,
-		0.1,
-		1000
-	);
-	camera.position.y = 1.5;
-	camera.position.z = 4;
-	scene.add(camera);
+  // Camera
+  const camera = new THREE.PerspectiveCamera(
+    75,
+    window.innerWidth / window.innerHeight,
+    0.1,
+    1000
+  );
+  camera.position.y = 1.5;
+  camera.position.z = 4;
+  scene.add(camera);
 
-	// Light
-	const ambientLight = new THREE.AmbientLight('white', 0.5);
-	scene.add(ambientLight);
+  // Light
+  const ambientLight = new THREE.AmbientLight('white', 0.5);
+  scene.add(ambientLight);
 
-	const directionalLight = new THREE.DirectionalLight('white', 1);
-	directionalLight.position.x = 1;
-	directionalLight.position.z = 2;
-	scene.add(directionalLight);
+  const directionalLight = new THREE.DirectionalLight('white', 1);
+  directionalLight.position.x = 1;
+  directionalLight.position.z = 2;
+  scene.add(directionalLight);
 
-	// Controls
-	const controls = new OrbitControls(camera, renderer.domElement);
-	controls.enableDamping = true;
-	
-	// Mesh
-	const planeGeometry = new THREE.PlaneGeometry(0.3, 0.3);
+  // Controls
+  const controls = new OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
 
-	const textureLoader = new THREE.TextureLoader();
+  // Mesh
+  const planeGeometry = new THREE.PlaneGeometry(0.3, 0.3);
 
-	// Points
-	const sphereGeometry = new THREE.SphereGeometry(1, 8, 8);
-	const spherePositionArray = sphereGeometry.attributes.position.array;
-	const randomPositionArray = [];
-	for (let i = 0; i < spherePositionArray.length; i++) {
-		randomPositionArray.push((Math.random() - 0.5) * 10);
-	}
+  const textureLoader = new THREE.TextureLoader();
 
-	// 여러개의 Plane Mesh 생성
-	const imagePanels = [];
-	let imagePanel;
-	for (let i = 0; i < spherePositionArray.length; i += 3) {
-		imagePanel = new ImagePanel({
-			textureLoader,
-			scene,
-			geometry: planeGeometry,
-			imageSrc: `/images/0${Math.ceil(Math.random() * 5)}.jpg`,
-			x: spherePositionArray[i],
-			y: spherePositionArray[i + 1],
-			z: spherePositionArray[i + 2]
-		});
+  // Points
+  const sphereGeometry = new THREE.SphereGeometry(1, 8, 8);
+  const spherePositionArray = sphereGeometry.attributes.position.array;
+  const randomPositionArray = [];
+  for (let i = 0; i < spherePositionArray.length; i++) {
+    randomPositionArray.push((Math.random() - 0.5) * 10);
+  }
 
-		imagePanels.push(imagePanel);
-	}
+  // 여러개의 Plane Mesh 생성
+  const imagePanels = [];
+  let imagePanel;
+  for (let i = 0; i < spherePositionArray.length; i += 3) {
+    imagePanel = new ImagePanel({
+      textureLoader,
+      scene,
+      geometry: planeGeometry,
+      imageSrc: `/images/0${Math.ceil(Math.random() * 5)}.jpg`,
+      x: spherePositionArray[i],
+      y: spherePositionArray[i + 1],
+      z: spherePositionArray[i + 2],
+    });
 
-	// 그리기
-	const clock = new THREE.Clock();
+    imagePanels.push(imagePanel);
+  }
 
-	function draw() {
-		const delta = clock.getDelta();
+  // 그리기
+  const clock = new THREE.Clock();
 
-		controls.update();
+  function draw() {
+    const delta = clock.getDelta();
 
-		renderer.render(scene, camera);
-		renderer.setAnimationLoop(draw);
-	}
+    controls.update();
 
-	function setSize() {
-		camera.aspect = window.innerWidth / window.innerHeight;
-		camera.updateProjectionMatrix();
-		renderer.setSize(window.innerWidth, window.innerHeight);
-		renderer.render(scene, camera);
-	}
+    renderer.render(scene, camera);
+    renderer.setAnimationLoop(draw);
+  }
 
-	function setShape(e) {
-		const type = e.target.dataset.type;
-		let array;
+  function setSize() {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.render(scene, camera);
+  }
 
-		switch (type) {
-			case 'random':
-				array = randomPositionArray;
-				break;
-			case 'sphere':
-				array = spherePositionArray;
-				break;
-		}
+  function setShape(e) {
+    const type = e.target.dataset.type;
+    let array;
 
-		for (let i = 0; i < imagePanels.length; i++) {
-			// 위치 이동
-			gsap.to(
-				imagePanels[i].mesh.position,
-				{
-					duration: 2,
-					x: array[i * 3],
-					y: array[i * 3 + 1],
-					z: array[i * 3 + 2]
-				}
-			);
+    switch (type) {
+      case 'random':
+        array = randomPositionArray;
+        break;
+      case 'sphere':
+        array = spherePositionArray;
+        break;
+    }
 
-			// 회전
-			if (type === 'random') {
-				gsap.to(
-					imagePanels[i].mesh.rotation,
-					{
-						duration: 2,
-						x: 0,
-						y: 0,
-						z: 0
-					}
-				);
-			} else if (type === 'sphere') {
-				gsap.to(
-					imagePanels[i].mesh.rotation,
-					{
-						duration: 2,
-						x: imagePanels[i].sphereRotationX,
-						y: imagePanels[i].sphereRotationY,
-						z: imagePanels[i].sphereRotationZ
-					}
-				);
-			}
-		}
-	}
+    for (let i = 0; i < imagePanels.length; i++) {
+      // 위치 이동
+      gsap.to(imagePanels[i].mesh.position, {
+        duration: 2,
+        x: array[i * 3],
+        y: array[i * 3 + 1],
+        z: array[i * 3 + 2],
+      });
 
-	// 버튼
-	const btnWrapper = document.createElement('div');
-	btnWrapper.classList.add('btns');
+      // 회전
+      if (type === 'random') {
+        gsap.to(imagePanels[i].mesh.rotation, {
+          duration: 2,
+          x: 0,
+          y: 0,
+          z: 0,
+        });
+      } else if (type === 'sphere') {
+        gsap.to(imagePanels[i].mesh.rotation, {
+          duration: 2,
+          x: imagePanels[i].sphereRotationX,
+          y: imagePanels[i].sphereRotationY,
+          z: imagePanels[i].sphereRotationZ,
+        });
+      }
+    }
+  }
 
-	const randomBtn = document.createElement('button');
-	randomBtn.dataset.type = 'random';
-	randomBtn.style.cssText = 'position: absolute; left: 20px; top: 20px';
-	randomBtn.innerHTML = 'Random';
-	btnWrapper.append(randomBtn);
+  // 버튼
+  const btnWrapper = document.createElement('div');
+  btnWrapper.classList.add('btns');
 
-	const sphereBtn = document.createElement('button');
-	sphereBtn.dataset.type = 'sphere';
-	sphereBtn.style.cssText = 'position: absolute; left: 20px; top: 50px';
-	sphereBtn.innerHTML = 'Sphere';
-	btnWrapper.append(sphereBtn);
+  const randomBtn = document.createElement('button');
+  randomBtn.dataset.type = 'random';
+  randomBtn.style.cssText = 'position: absolute; left: 20px; top: 20px';
+  randomBtn.innerHTML = 'Random';
+  btnWrapper.append(randomBtn);
 
-	document.body.append(btnWrapper);
+  const sphereBtn = document.createElement('button');
+  sphereBtn.dataset.type = 'sphere';
+  sphereBtn.style.cssText = 'position: absolute; left: 20px; top: 50px';
+  sphereBtn.innerHTML = 'Sphere';
+  btnWrapper.append(sphereBtn);
 
-	// 이벤트
-	btnWrapper.addEventListener('click', setShape);
-	window.addEventListener('resize', setSize);
+  document.body.append(btnWrapper);
 
-	draw();
+  // 이벤트
+  btnWrapper.addEventListener('click', setShape);
+  window.addEventListener('resize', setSize);
+
+  draw();
 }
